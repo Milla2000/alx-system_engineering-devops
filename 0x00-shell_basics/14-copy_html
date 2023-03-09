@@ -1,14 +1,2 @@
 #!/bin/bash
-# Copy all HTML files from the current directory to the parent directory
-# Only copy files that do not exist in the parent directory or are newer
-
-parent_dir=$(dirname $(pwd))
-
-for file in *.html; do
-    if [[ ! -e "$parent_dir/$file" || "$file" -nt "$parent_dir/$file" ]]; then
-        cp "$file" "$parent_dir"
-        echo "Copied $file to $parent_dir"
-    else
-        echo "Skipping $file (already exists in $parent_dir)"
-    fi
-done
+cp -ruv *.html ..
