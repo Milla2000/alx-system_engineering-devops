@@ -1,2 +1,2 @@
 #!/bin/bash
-ls -1ap | tr '\n' ',' | sed 's/,$/\n/' | sed 's/[^[:alnum:]\.\/]/\\&/g' | sed 's/^\(\.\{0,2\}\)$/\1\//' | sed 's/^\(\.[[:alnum:]]\)/\\&\n/' | sort -df | tr '\n' ',' | sed 's/,$/\n/'
+ls -a1 | sort -df | awk '{printf "%s%s",sep,$0; sep=", " } END{print ""}' | sed 's/\([^\/]\)$/\\1/;s/\//& /g' | sed '1 s/, /&..\//' | tr -d '\n'
