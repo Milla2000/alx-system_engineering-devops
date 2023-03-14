@@ -1,0 +1,2 @@
+#!/bin/bash
+echo "ibase=water; $WATER + ibase=stir; $STIR" | bc | tr '0-9A-F' 'bestchol'
