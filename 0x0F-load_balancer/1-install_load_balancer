@@ -1,15 +1,12 @@
 #!/usr/bin/env bash
 #Installs and configures HAproxy in a load balancer server
-
 apt-get install -y software-properties-common
 add-apt-repository -y ppa:vbernat/haproxy-1.8
 apt-get update
 apt-get install -y haproxy=1.8.\*
-
 echo "ENABLED=1" >> /etc/default/haproxy
 mv /etc/haproxy/haproxy.cfg{,.original}
 touch /etc/haproxy/haproxy.cfg
-
 printf %s "global
     log 127.0.0.1 local0 notice
     maxconn 2000
@@ -36,5 +33,4 @@ listen hbnb
     server 324541-web-01 54.234.89.183:80 check
     server 324541-web-02 100.26.165.1:80 check
 " >> /etc/haproxy/haproxy.cfg
-
 service haproxy start
