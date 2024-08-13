@@ -1,31 +1,46 @@
 #!/usr/bin/python3
-"""Contains recurse function"""
+"""
+Module that queries the Reddit API and returns a list containing the
+titles of all hot articles for a given subreddit. If no results are
+found for the given subreddit, the function should return None.
+"""
 import requests
 
 
-def recurse(subreddit, hot_list=[], after="", count=0):
-    """Returns a list of titles of all hot posts on a given subreddit."""
-    url = "https://www.reddit.com/r/{}/hot/.json".format(subreddit)
-    headers = {
-        "User-Agent": "0x16-api_advanced:project:\
-v1.0.0 (by /u/firdaus_cartoon_jr)"
-    }
-    params = {
-        "after": after,
-        "count": count,
-        "limit": 100
-    }
-    response = requests.get(url, headers=headers, params=params,
-                            allow_redirects=False)
-    if response.status_code == 404:
+def recurse(subreddit, hot_list=[], after=None):
+    """
+    Recursive function that queries the Reddit API and returns a list
+    containing the titles of all hot articles for a given subreddit.
+    If no results are found for the given subreddit, return None.
+    """
+    url = f"https://www.reddit.com/r/{subreddit}/hot.json"
+    headers = {'User-Agent': 'MyBot/0.0.1'}
+    params = {'limit': 100, 'after': after}
+    try:
+        response = requests.get(url, headers=headers, params=params)
+        response.raise_for_status()
+        data = response.json()
+        posts = data['data'].get('children', [])
+        if not posts:
+            return None if not hot_list else hot_list
+        hot_list.extend(post['data']['title'] for post in posts)
+        after = data['data'].get('after')
+        if after:
+            return recurse(subreddit, hot_list, after)
+        else:
+            return hot_list
+    except requests.exceptions.RequestException:
         return None
 
-    results = response.json().get("data")
-    after = results.get("after")
-    count += results.get("dist")
-    for c in results.get("children"):
-        hot_list.append(c.get("data").get("title"))
 
-    if after is not None:
-        return recurse(subreddit, hot_list, after, count)
-    return hot_list
+if __name__ == "__main__":
+    result = recurse("programming")
+    if result is not None:
+        print(len(result))
+    else:
+        print("None")
+    result = recurse("this_is_a_fake_subreddit")
+    if result is not None:
+        print(len(result))
+    else:
+        print("None")
