@@ -1,24 +1,35 @@
 #!/usr/bin/python3
-'''
-    this module contains the function top_ten
-'''
+"""
+Module that queries the Reddit API and prints the titles of the first 10
+hot posts listed for a given subreddit.
+"""
+
 import requests
-from sys import argv
 
 
 def top_ten(subreddit):
-    '''
-        returns the top ten posts for a given subreddit
-    '''
-    user = {'User-Agent': 'Lizzie'}
-    url = requests.get('https://www.reddit.com/r/{}/hot/.json?limit=10'
-                       .format(subreddit), headers=user).json()
+    """
+    Function that queries the Reddit API and prints the titles of the first
+    10 hot posts listed for a given subreddit. If the subreddit is invalid,
+    prints None.
+    """
+    url = f"https://www.reddit.com/r/{subreddit}/hot.json"
+    headers = {'User-Agent': 'MyBot/0.0.1'}
+    params = {'limit': 10}
     try:
-        for post in url.get('data').get('children'):
-            print(post.get('data').get('title'))
-    except Exception:
+        response = requests.get(url, headers=headers, params=params)
+        response.raise_for_status()
+        data = response.json()
+        posts = data['data'].get('children', [])
+        if not posts:
+            print(None)
+            return
+        for post in posts:
+            print(post['data']['title'])
+    except requests.exceptions.RequestException:
         print(None)
 
 
 if __name__ == "__main__":
-    top_ten(argv[1])
+    top_ten("programming")
+    top_ten("this_is_a_fake_subreddit")
